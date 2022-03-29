@@ -25,3 +25,11 @@ def get_user_pagenation(db: Session, page_size: int, current_page: int) -> [User
 def get_user_total(db: Session) -> int:
     total = db.query(User).count()
     return total
+
+
+def active(db: Session, id: int, state: int):
+    user = db.query(User).filter(User.id == id).first()
+    user.state = state
+    db.commit()
+    db.flush()
+

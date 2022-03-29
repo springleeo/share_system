@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
 from pydantic import BaseModel
+from typing import Optional
 
 
 class UserRet(BaseModel):
-    id: int
+    id: Optional[int]
     # 用户名
-    username: str
+    username: Optional[str]
     # todo 部门外健
-    dep_id: int
+    dep_id: Optional[int]
     # 头像
-    avatar: str
+    avatar: Optional[str]
     # 地址
-    addr: str
+    addr: Optional[str]
     # 状态
-    state: int
+    state: Optional[int]
     # 上次登陆日期
-    last_login_date: str
+    last_login_date: Optional[str]
     # 上次登录的IP地址
-    ip: str
+    ip: Optional[str]
     # 创建时间:年月日 时分秒
-    create_time: str
+    create_time: Optional[str]
     # 创建日期
-    create_date: str
+    create_date: Optional[str]
