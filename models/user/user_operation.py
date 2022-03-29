@@ -2,6 +2,7 @@
 
 from sqlalchemy.orm import Session
 from models.user.user_model import User
+from models.user.user_ret_model import UserRet
 
 
 def get_user_by_username_and_pwd(db: Session, username: str, md5_pwd: str) -> User:
@@ -16,6 +17,11 @@ def get_user_by_id(db: Session, id: int) -> User:
     return user
 
 
-def get_user_pagenation(db: Session, page_size: int, current_page: int):
-    user = db.query(User).limit(page_size).offset((current_page - 1) * page_size)
-    return user
+def get_user_pagenation(db: Session, page_size: int, current_page: int) -> [User]:
+    users = db.query(User).limit(page_size).offset((current_page - 1) * page_size).all()
+    return users
+
+
+def get_user_total(db: Session) -> int:
+    total = db.query(User).count()
+    return total
