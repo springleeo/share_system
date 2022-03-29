@@ -16,4 +16,6 @@ def get_user_by_id(db: Session, id: int) -> User:
     return user
 
 
-
+def get_user_pagenation(db: Session, page_size: int, current_page: int):
+    user = db.query(User).limit(page_size).offset((current_page - 1) * page_size)
+    return user

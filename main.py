@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
 from starlette.staticfiles import StaticFiles
-
+from apps.user.views import router as user_router
 from extend.db import Engine, LocalSession, Base
 from extend.get_db import get_db
 from utils.get_md5_data import get_md5_pwd
@@ -21,6 +21,8 @@ app = FastAPI(
     title='知了网盘分享系统',
     description='知了网盘分享系统'
 )
+
+app.include_router(user_router)
 
 # 静态文件
 app.mount("/static", StaticFiles(directory=str(pathlib.Path(__file__).parent.absolute()) + '/static'), name="static")
