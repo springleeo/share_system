@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.get('/user_list')
+@router.get('/user_list', tags=['用户模块'])
 def get_user_list(page_size: int, current_page: int, id: str = Depends(token.parse_token),
                   db: Session = Depends(get_db)):
     users = get_user_pagenation(db, page_size, current_page)
@@ -29,7 +29,7 @@ def get_user_list(page_size: int, current_page: int, id: str = Depends(token.par
     return content
 
 
-@router.post('/active')
+@router.post('/active', tags=['用户模块'])
 def active_user(user: UserRet, id: str = Depends(token.parse_token), db: Session = Depends(get_db)):
     if user.state == 1:
         state = 2
@@ -44,7 +44,7 @@ def active_user(user: UserRet, id: str = Depends(token.parse_token), db: Session
 
 
 # 用户修改，涉及图片上传，用formdata的形式
-@router.post('/update')
+@router.post('/update', tags=['用户模块'])
 async def upload(avatar: UploadFile = File(...),
                  id: int = Form(...),
                  username: str = Form(...),

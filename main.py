@@ -2,7 +2,7 @@
 import pathlib
 
 import uvicorn
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -15,11 +15,11 @@ from extend.db import Engine, LocalSession, Base
 from extend.get_db import get_db
 from utils.get_md5_data import get_md5_pwd
 from utils import token
-from models.user.user_operation import get_user_by_username_and_pwd, get_user_by_id
+from models.user.user_operation import get_user_by_username_and_pwd, get_user_by_id, update_login_time_and_ip
 
 app = FastAPI(
-    title='知了网盘分享系统',
-    description='知了网盘分享系统'
+    title='网盘共享系统',
+    description='网盘共享系统'
 )
 
 app.include_router(user_router)
@@ -43,8 +43,8 @@ app.add_middleware(
 Base.metadata.create_all(Engine)
 
 
-@app.post('/login')
-def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@app.post('/login',tags=['登陆模块'])
+def login(request: Request, user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     # 1.用户信息获取
     username = user.username
     # 密码加密
@@ -53,7 +53,6 @@ def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     # 2.数据库校验
     user = get_user_by_username_and_pwd(db, username, md5_pwd)
 
-    print(user)
     if user:
         pass
         # 3.token生成
@@ -62,8 +61,9 @@ def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
         # 4.返回token及用户信息，日期格式转化
         ret_user = {'username': user.username, 'avatar': user.avatar, 'ip': user.ip,
                     'expire_time': user.last_login_date.strftime('%Y-%m-%d')
-
                     }
+        last_date = datetime.now()
+        update_login_time_and_ip(db, user.id, last_date, request.client.host)
         content = {'code': 200, 'msg': '登陆成功', 'token': ret_token, 'user': ret_user}
         return JSONResponse(content=content)
     else:
@@ -71,7 +71,7 @@ def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
         return JSONResponse(content=content)
 
 
-@app.get('/index')
+@app.get('/index',tags=['首页模块'])
 def index(id: str = Depends(token.parse_token), db: Session = Depends(get_db)):
     # 根据token解析出来的id查询数据库
     user = get_user_by_id(db, id=int(id))

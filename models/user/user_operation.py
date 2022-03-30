@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from models.user.user_model import User
 from models.user.user_ret_model import UserRet
 from typing import Optional
+import datetime
 
 
 def get_user_by_username_and_pwd(db: Session, username: str, md5_pwd: str) -> User:
@@ -11,6 +12,14 @@ def get_user_by_username_and_pwd(db: Session, username: str, md5_pwd: str) -> Us
         User.username == username,
         User.pwd == md5_pwd).first()
     return user
+
+
+def update_login_time_and_ip(db: Session, user_id: int, login_date: datetime.datetime, ip: str):
+    user = db.query(User).filter(User.id == user_id).first()
+    user.last_login_date = login_date
+    user.ip = ip
+    db.commit()
+    db.flush()
 
 
 def get_user_by_id(db: Session, id: int) -> User:
