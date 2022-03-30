@@ -51,6 +51,7 @@ async def upload(avatar: UploadFile = File(...),
                  pwd: str = Form(...),
                  addr: str = Form(...),
                  state: int = Form(...),
+                 create_time: str = Form(...),
                  user_id: str = Depends(token.parse_token),
                  db: Session = Depends(get_db)):
     rep = await avatar.read()

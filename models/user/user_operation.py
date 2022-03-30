@@ -7,7 +7,7 @@ from typing import Optional
 
 
 def get_user_by_username_and_pwd(db: Session, username: str, md5_pwd: str) -> User:
-    user = db.query(User.id, User.username, User.avatar, User.ip, User.last_login_date).filter(
+    user = db.query(User).filter(
         User.username == username,
         User.pwd == md5_pwd).first()
     return user
@@ -19,7 +19,8 @@ def get_user_by_id(db: Session, id: int) -> User:
 
 
 def get_user_pagenation(db: Session, page_size: int, current_page: int) -> [User]:
-    users = db.query(User.id, User.username, User.avatar, User.ip, User.last_login_date, User.addr, User.state).limit(
+    users = db.query(User.id, User.username, User.avatar, User.ip, User.last_login_date, User.addr, User.state,
+                     User.create_time).limit(
         page_size).offset((current_page - 1) * page_size).all()
     return users
 
@@ -43,7 +44,6 @@ def user_update(db: Session, id: int, username: str, pwd: str, addr: str, state:
         user.pwd = pwd
     user.addr = addr
     user.state = state
-
     user.avatar = '/' + avatar
     db.commit()
     db.flush()
