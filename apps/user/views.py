@@ -37,6 +37,6 @@ def active_user(user: UserRet, id: str = Depends(token.parse_token), db: Session
 
     active(db, user.id, state)
     if user.state == 1:
-        return {'code': 200, 'msg': '停用成功'}
+        return {'code': 200, 'msg': '停用成功', 'state': 1}
     if user.state == 2:
-        return {'code': 200, 'msg': '启用成功'}
+        return {'code': 200, 'msg': '启用成功', 'state': 2}
