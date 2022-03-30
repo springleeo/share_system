@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File, Form
 # from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -7,7 +7,8 @@ from extend.get_db import get_db
 from models.user.user_model import User
 from models.user.user_ret_model import UserRet
 from utils import token
-from models.user.user_operation import get_user_pagenation, get_user_total, active
+from utils.get_md5_data import get_md5_pwd
+from models.user.user_operation import get_user_pagenation, get_user_total, active, user_update
 
 router = APIRouter(
     prefix='/user'
@@ -40,3 +41,26 @@ def active_user(user: UserRet, id: str = Depends(token.parse_token), db: Session
         return {'code': 200, 'msg': '停用成功', 'state': 1}
     if user.state == 2:
         return {'code': 200, 'msg': '启用成功', 'state': 2}
+
+
+# 用户修改，涉及图片上传，用formdata的形式
+@router.post('/update')
+async def upload(avatar: UploadFile = File(...),
+                 id: int = Form(...),
+                 username: str = Form(...),
+                 pwd: str = Form(...),
+                 addr: str = Form(...),
+                 state: int = Form(...),
+                 user_id: str = Depends(token.parse_token),
+                 db: Session = Depends(get_db)):
+    rep = await avatar.read()
+    file_path = 'uploads/users/' + avatar.filename
+    with open(file_path, 'wb') as f:
+        f.write(rep)
+    if pwd:
+        md5_pwd = get_md5_pwd(pwd)
+    else:
+        md5_pwd = None
+    user_update(db, id, username, md5_pwd, addr, state, file_path)
+
+    return {'code': 200, 'msg': '更新成功', 'id': id}

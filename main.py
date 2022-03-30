@@ -25,7 +25,7 @@ app = FastAPI(
 app.include_router(user_router)
 
 # 静态文件
-app.mount("/static", StaticFiles(directory=str(pathlib.Path(__file__).parent.absolute()) + '/static'), name="static")
+app.mount("/uploads", StaticFiles(directory=str(pathlib.Path(__file__).parent.absolute()) + '/uploads'), name="uploads")
 
 # token过期时间
 EXPIRE_MINUTE = 60
