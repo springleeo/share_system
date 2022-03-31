@@ -7,6 +7,8 @@ class UserRet(BaseModel):
     id: Optional[int]
     # 用户名
     username: Optional[str]
+    # 密码
+    pwd: Optional[str]
     # todo 部门外健
     dep_id: Optional[int]
     # 头像

@@ -58,6 +58,17 @@ def user_update(db: Session, id: int, username: str, pwd: str, addr: str, state:
     db.flush()
 
 
+def user_add(db: Session, username: str, pwd: str, addr: str, state: int, avatar: str):
+    user = User(username=username,
+                pwd=pwd,
+                avatar='/' + avatar,
+                addr=addr,
+                state=state)
+    db.add(user)
+    db.commit()
+    db.flush()
+
+
 def delete_user_by_id(db: Session, id: int):
     user = db.query(User).filter(User.id == id).first()
     db.delete(user)

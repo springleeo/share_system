@@ -36,7 +36,7 @@ class User(Base):
     dep_id = Column(Integer, ForeignKey('department.id'))
 
     # 头像
-    avatar = Column(String(255))
+    avatar = Column(String(255), default='/uploads/users/img.jpg')
     # 地址
     addr = Column(String(255))
     # 状态

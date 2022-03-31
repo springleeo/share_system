@@ -8,7 +8,8 @@ from models.user.user_model import User
 from models.user.user_ret_model import UserRet
 from utils import token
 from utils.get_md5_data import get_md5_pwd
-from models.user.user_operation import get_user_pagenation, get_user_total, active, user_update, delete_user_by_id
+from models.user.user_operation import get_user_pagenation, get_user_total, active, user_update, delete_user_by_id, \
+    user_add
 
 router = APIRouter(
     prefix='/user'
@@ -42,6 +43,26 @@ def active_user(user: UserRet, id: str = Depends(token.parse_token), db: Session
     if user.state == 2:
         return {'code': 200, 'msg': '启用成功', 'state': 2}
 
+
+# 添加用户
+@router.post('/add', tags=['用户模块'])
+async def add(avatar: UploadFile = File(...),
+              username: str = Form(...),
+              pwd: str = Form(...),
+              addr: str = Form(...),
+              state: int = Form(...),
+              user_id: str = Depends(token.parse_token),
+              db: Session = Depends(get_db)):
+    rep = await avatar.read()
+    file_path = 'uploads/users/' + avatar.filename
+    with open(file_path, 'wb') as f:
+        f.write(rep)
+    md5_pwd = get_md5_pwd(pwd)
+    user_add(db, username, md5_pwd, addr, state, file_path)
+    return JSONResponse(content={
+        'code': 200,
+        'msg': '添加成功',
+    })
 
 # 用户修改，涉及图片上传，用formdata的形式
 @router.post('/edit', tags=['用户模块'])
