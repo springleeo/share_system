@@ -43,7 +43,7 @@ app.add_middleware(
 Base.metadata.create_all(Engine)
 
 
-@app.post('/login',tags=['登陆模块'])
+@app.post('/login', tags=['登陆模块'])
 def login(request: Request, user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     # 1.用户信息获取
     username = user.username
@@ -71,7 +71,7 @@ def login(request: Request, user: OAuth2PasswordRequestForm = Depends(), db: Ses
         return JSONResponse(content=content)
 
 
-@app.get('/index',tags=['首页模块'])
+@app.get('/index', tags=['首页模块'])
 def index(id: str = Depends(token.parse_token), db: Session = Depends(get_db)):
     # 根据token解析出来的id查询数据库
     user = get_user_by_id(db, id=int(id))
