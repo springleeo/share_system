@@ -9,7 +9,7 @@ from models.user.user_ret_model import UserRet
 from utils import token
 from utils.get_md5_data import get_md5_pwd
 from models.user.user_operation import get_user_pagenation, get_user_total, active, user_update, delete_user_by_id, \
-    user_add
+    user_add, get_user_query_pagenation, get_user_query_total
 
 router = APIRouter(
     prefix='/user'
@@ -21,6 +21,20 @@ def get_user_list(page_size: int, current_page: int, id: str = Depends(token.par
                   db: Session = Depends(get_db)):
     users = get_user_pagenation(db, page_size, current_page)
     total = get_user_total(db)
+    content = {
+        'users': users,
+        'pageSize': page_size,
+        'currentPage': current_page,
+        'pageTotal': total
+    }
+    return content
+
+
+@router.get('/query', tags=['用户模块'])
+def get_user_query_list(username: str, page_size: int, current_page: int, id: str = Depends(token.parse_token),
+                        db: Session = Depends(get_db)):
+    users = get_user_query_pagenation(db, username, page_size, current_page)
+    total = get_user_query_total(db, username)
     content = {
         'users': users,
         'pageSize': page_size,
@@ -63,6 +77,7 @@ async def add(avatar: UploadFile = File(...),
         'code': 200,
         'msg': '添加成功',
     })
+
 
 # 用户修改，涉及图片上传，用formdata的形式
 @router.post('/edit', tags=['用户模块'])

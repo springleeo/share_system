@@ -34,8 +34,20 @@ def get_user_pagenation(db: Session, page_size: int, current_page: int) -> [User
     return users
 
 
+def get_user_query_pagenation(db: Session, username: str, page_size: int, current_page: int) -> [User]:
+    users = db.query(User.id, User.username, User.avatar, User.ip, User.last_login_date, User.addr, User.state,
+                     User.create_time).filter(User.username == username).limit(
+        page_size).offset((current_page - 1) * page_size).all()
+    return users
+
+
 def get_user_total(db: Session) -> int:
     total = db.query(User).count()
+    return total
+
+
+def get_user_query_total(db: Session, username: str) -> int:
+    total = db.query(User).filter(User.username == username).count()
     return total
 
 
