@@ -54,7 +54,9 @@ def login(request: Request, user: OAuth2PasswordRequestForm = Depends(), db: Ses
     user = get_user_by_username_and_pwd(db, username, md5_pwd)
 
     if user:
-        pass
+        if user.state == 2:
+            content = {'code': 500, 'msg': '用户已停用，请联系管理员！'}
+            return JSONResponse(content=content)
         # 3.token生成
         expire_time = timedelta(minutes=EXPIRE_MINUTE)
         ret_token = token.create_token({'sub': str(user.id)}, expire_time)
