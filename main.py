@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 
 from starlette.staticfiles import StaticFiles
 from apps.user.views import router as user_router
+from apps.department.views import router as department_router
 from extend.db import Engine, LocalSession, Base
 from extend.get_db import get_db
 from utils.get_md5_data import get_md5_pwd
@@ -23,6 +24,7 @@ app = FastAPI(
 )
 
 app.include_router(user_router)
+app.include_router(department_router)
 
 # 静态文件
 app.mount("/uploads", StaticFiles(directory=str(pathlib.Path(__file__).parent.absolute()) + '/uploads'), name="uploads")
