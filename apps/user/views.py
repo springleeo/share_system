@@ -9,7 +9,7 @@ from models.user.user_ret_model import UserRet
 from utils import token
 from utils.get_md5_data import get_md5_pwd
 from models.user.user_operation import get_user_pagenation, get_user_total, active, user_update, delete_user_by_id, \
-    user_add, get_user_query_pagenation, get_user_query_total
+    user_add, get_user_query_pagenation, get_user_query_total, get_departments, get_departments_except_me
 
 router = APIRouter(
     prefix='/user'
@@ -62,6 +62,7 @@ def active_user(user: UserRet, id: str = Depends(token.parse_token), db: Session
 @router.post('/add', tags=['用户模块'])
 async def add(avatar: UploadFile = File(...),
               username: str = Form(...),
+              department_name: str = Form(...),
               pwd: str = Form(...),
               addr: str = Form(...),
               state: int = Form(...),
@@ -72,7 +73,7 @@ async def add(avatar: UploadFile = File(...),
     with open(file_path, 'wb') as f:
         f.write(rep)
     md5_pwd = get_md5_pwd(pwd)
-    user_add(db, username, md5_pwd, addr, state, file_path)
+    user_add(db, username, md5_pwd, addr, state, file_path, department_name)
     return JSONResponse(content={
         'code': 200,
         'msg': '添加成功',
@@ -87,6 +88,7 @@ async def edit(avatar: UploadFile = File(...),
                pwd: str = Form(...),
                addr: str = Form(...),
                state: int = Form(...),
+               department_name: str = Form(...),
                # create_time: str = Form(...),
                user_id: str = Depends(token.parse_token),
                db: Session = Depends(get_db)):
@@ -98,7 +100,7 @@ async def edit(avatar: UploadFile = File(...),
         md5_pwd = get_md5_pwd(pwd)
     else:
         md5_pwd = None
-    user_update(db, id, username, md5_pwd, addr, state, file_path)
+    user_update(db, id, username, md5_pwd, addr, state, file_path,department_name)
 
     return {'code': 200, 'msg': '更新成功', 'id': id}
 
@@ -114,3 +116,29 @@ def delete_user(user: UserRet,
         'msg': '删除成功',
         'id': id
     })
+
+
+# 获取所有的部门
+@router.get('/get_departments')
+def get_department(user_id: str = Depends(token.parse_token),
+                   db: Session = Depends(get_db)):
+    departments = get_departments(db)
+    return {
+        'code': 200,
+        'msg': '查询成功',
+        'departments': departments
+    }
+
+
+# 获取除自己以外的所有部门
+@router.get('/get_departments_except_me')
+def get_department_except(
+        id: int,
+        user_id: str = Depends(token.parse_token),
+        db: Session = Depends(get_db)):
+    departments = get_departments_except_me(db, id)
+    return {
+        'code': 200,
+        'msg': '查询成功',
+        'departments': departments
+    }

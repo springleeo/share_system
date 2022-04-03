@@ -28,13 +28,13 @@ import datetime
 
 
 def get_department_pagenation(db: Session, page_size: int, current_page: int) -> [Department]:
-    users = db.query(Department.id, Department.name, Department.leader, Department.desc, Department.state,
+    users = db.query(Department.id, Department.name, Department.leader, Department.desc,
                      Department.create_time).limit(page_size).offset((current_page - 1) * page_size).all()
     return users
 
 
 def get_department_query_pagenation(db: Session, name: str, page_size: int, current_page: int) -> [Department]:
-    departments = db.query(Department.id, Department.name, Department.leader, Department.desc, Department.state,
+    departments = db.query(Department.id, Department.name, Department.leader, Department.desc,
                            Department.create_time).filter(Department.name == name).limit(
         page_size).offset((current_page - 1) * page_size).all()
     return departments
@@ -55,16 +55,16 @@ def department_edit(db: Session, departments: DepartmentRet):
     department.name = departments.name
     department.leader = departments.leader
     department.desc = departments.desc
-    department.state = departments.state
+    # department.state = departments.state
     db.commit()
     db.flush()
 
 
-def active(db: Session, id: int, state: int):
-    department = db.query(Department).filter(Department.id == id).first()
-    department.state = state
-    db.commit()
-    db.flush()
+# def active(db: Session, id: int, state: int):
+#     department = db.query(Department).filter(Department.id == id).first()
+#     department.state = state
+#     db.commit()
+#     db.flush()
 
 
 def delete_department_by_id(db: Session, id: int):
@@ -78,7 +78,7 @@ def department_add(db: Session, department: DepartmentRet):
     department = Department(name=department.name,
                             leader=department.leader,
                             desc=department.desc,
-                            state=department.state)
+                            )
     db.add(department)
     db.commit()
     db.flush()

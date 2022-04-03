@@ -10,13 +10,11 @@ class Department(Base):
     __tablename__ = "department"
     id = Column(Integer, primary_key=True, autoincrement=True)
     # 部门名称
-    name = Column(String(255))
+    name = Column(String(255),unique=True)
     # 部门主管
     leader = Column(String(255))
     # 部门职责
     desc = Column(String(255))
-    # 状态，1表示启用，2表示停用
-    state = Column(Integer, default=1)
     # 用户表的反向关系
     user = relationship('User', backref='department')
     # 创建时间:年月日 时分秒

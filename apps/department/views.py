@@ -9,7 +9,7 @@ from models.department.department_ret_model import DepartmentRet
 from utils import token
 from utils.get_md5_data import get_md5_pwd
 from models.department.department_operation import get_department_pagenation, get_department_query_pagenation, \
-    get_department_total, get_department_query_total, department_edit, active, delete_department_by_id,department_add
+    get_department_total, get_department_query_total, department_edit, delete_department_by_id,department_add
 
 router = APIRouter(
     prefix='/department'
@@ -57,15 +57,15 @@ async def edit(
     content = {'code': 200, 'msg': '更新成功'}
     return content
 
-
-@router.post('/active', tags=['部门模块'])
-def active_user(department: DepartmentRet, id: str = Depends(token.parse_token), db: Session = Depends(get_db)):
-    if department.state == 1:
-        active(db, department.id, state=2)
-        return {'code': 200, 'msg': '停用成功', 'state': 2}
-    if department.state == 2:
-        active(db, department.id, state=1)
-        return {'code': 200, 'msg': '启用成功', 'state': 1}
+#
+# @router.post('/active', tags=['部门模块'])
+# def active_user(department: DepartmentRet, id: str = Depends(token.parse_token), db: Session = Depends(get_db)):
+#     if department.state == 1:
+#         active(db, department.id, state=2)
+#         return {'code': 200, 'msg': '停用成功', 'state': 2}
+#     if department.state == 2:
+#         active(db, department.id, state=1)
+#         return {'code': 200, 'msg': '启用成功', 'state': 1}
 
 
 @router.post('/delete')
