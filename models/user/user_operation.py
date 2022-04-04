@@ -34,21 +34,53 @@ def get_user_pagenation(db: Session, page_size: int, current_page: int) -> [User
     return users
 
 
-def get_user_query_pagenation(db: Session, username: str, page_size: int, current_page: int) -> [User]:
-    users = db.query(User.id, User.username, User.avatar, User.ip, User.last_login_date, User.addr, User.state,
-                     User.create_time, User.dep_id, Department.name).join(Department).filter(
-        User.username == username).limit(
-        page_size).offset((current_page - 1) * page_size).all()
+def get_user_query_pagenation(db: Session, username: str, department_name: str, page_size: int, current_page: int) -> [
+    User]:
+    department = db.query(Department).filter(Department.name == department_name).first()
+    if department:
+        if username:
+            users = db.query(User.id, User.username, User.avatar, User.ip, User.last_login_date, User.addr, User.state,
+                             User.create_time, User.dep_id, Department.name) \
+                .join(Department) \
+                .filter(User.username.like('%' + username + '%'), User.dep_id == department.id) \
+                .limit(page_size) \
+                .offset((current_page - 1) * page_size).all()
+        else:
+            users = db.query(User.id, User.username, User.avatar, User.ip, User.last_login_date, User.addr, User.state,
+                             User.create_time, User.dep_id, Department.name) \
+                .join(Department) \
+                .filter(User.dep_id == department.id) \
+                .limit(page_size) \
+                .offset((current_page - 1) * page_size).all()
+    else:
+        if username:
+            users = db.query(User.id, User.username, User.avatar, User.ip, User.last_login_date, User.addr, User.state,
+                             User.create_time, User.dep_id, Department.name) \
+                .filter(User.username.like('%' + username + '%')) \
+                .limit(page_size) \
+                .offset((current_page - 1) * page_size).all()
+        else:
+            users = get_user_pagenation(db, page_size, current_page)
     return users
 
 
-def get_user_total(db: Session) -> int:
+def get_user_total(db: Session, ) -> int:
     total = db.query(User).count()
     return total
 
 
-def get_user_query_total(db: Session, username: str) -> int:
-    total = db.query(User).filter(User.username == username).count()
+def get_user_query_total(db: Session, username: str, department_name: str) -> int:
+    department = db.query(Department).filter(Department.name == department_name).first()
+    if department:
+        if username:
+            total = db.query(User).filter(User.username.like('%' + username + '%'), User.dep_id == department.id).count()
+        else:
+            total = db.query(User).filter(User.dep_id == department.id).count()
+    else:
+        if username:
+            total = db.query(User).filter(User.username.like('%' + username + '%')).count()
+        else:
+            total = db.query(User).count()
     return total
 
 

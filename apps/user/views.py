@@ -21,20 +21,24 @@ def get_user_list(page_size: int, current_page: int, id: str = Depends(token.par
                   db: Session = Depends(get_db)):
     users = get_user_pagenation(db, page_size, current_page)
     total = get_user_total(db)
+    departments = get_departments(db)  # 用于前端选择部门时展示
     content = {
         'users': users,
         'pageSize': page_size,
         'currentPage': current_page,
-        'pageTotal': total
+        'pageTotal': total,
+        'departments': departments
     }
     return content
 
 
 @router.get('/query', tags=['用户模块'])
-def get_user_query_list(username: str, page_size: int, current_page: int, id: str = Depends(token.parse_token),
+def get_user_query_list(username: str, department_name: str, page_size: int, current_page: int,
+                        id: str = Depends(token.parse_token),
                         db: Session = Depends(get_db)):
-    users = get_user_query_pagenation(db, username, page_size, current_page)
-    total = get_user_query_total(db, username)
+    users = get_user_query_pagenation(db, username, department_name, page_size, current_page)
+    total = get_user_query_total(db, username, department_name)
+
     content = {
         'users': users,
         'pageSize': page_size,
@@ -100,7 +104,7 @@ async def edit(avatar: UploadFile = File(...),
         md5_pwd = get_md5_pwd(pwd)
     else:
         md5_pwd = None
-    user_update(db, id, username, md5_pwd, addr, state, file_path,department_name)
+    user_update(db, id, username, md5_pwd, addr, state, file_path, department_name)
 
     return {'code': 200, 'msg': '更新成功', 'id': id}
 

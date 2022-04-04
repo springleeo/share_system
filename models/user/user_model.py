@@ -30,7 +30,7 @@ class User(Base):
     username = Column(String(255))
     # 密码
     pwd = Column(String(255))
-    # todo 部门外健
+    # 部门外健
     dep_id = Column(Integer, ForeignKey('department.id'))
 
     # 头像
