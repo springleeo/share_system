@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from models.user.user_model import Department
 from models.department.department_ret_model import DepartmentRet
 from typing import Optional
@@ -34,9 +35,18 @@ def get_department_pagenation(db: Session, page_size: int, current_page: int) ->
 
 
 def get_department_query_pagenation(db: Session, name: str, page_size: int, current_page: int) -> [Department]:
+    # departments = db.query(Department.id, Department.name, Department.leader, Department.desc,
+    #                        Department.create_time).filter(Department.name == name).limit(
+    #     page_size).offset((current_page - 1) * page_size).all()
+
+    # 多条件或查询or_
     departments = db.query(Department.id, Department.name, Department.leader, Department.desc,
-                           Department.create_time).filter(Department.name == name).limit(
-        page_size).offset((current_page - 1) * page_size).all()
+                           Department.create_time).filter(
+        or_(Department.name.like("%" + name + "%") if name is not None else "",
+            Department.leader.like("%" + name + "%") if name is not None else "",
+            Department.desc.like("%" + name + "%") if name is not None else "")
+    ).limit(page_size).offset((current_page - 1) * page_size).all()
+
     return departments
 
 
