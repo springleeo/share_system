@@ -56,7 +56,10 @@ def get_department_total(db: Session) -> int:
 
 
 def get_department_query_total(db: Session, name: str) -> int:
-    total = db.query(Department).filter(Department.name == name).count()
+    # total = db.query(Department).filter(Department.name == name).count()
+    total = db.query(Department).filter(or_(Department.name.like("%" + name + "%"),
+                                            Department.leader.like("%" + name + "%"),
+                                            Department.desc.like("%" + name + "%"))).count()
     return total
 
 
