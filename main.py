@@ -9,6 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
+from fastapi.openapi.docs import (
+    get_redoc_html,
+    get_swagger_ui_html,
+    get_swagger_ui_oauth2_redirect_html,
+)
 
 from starlette.staticfiles import StaticFiles
 from apps.user.views import router as user_router
@@ -21,8 +26,10 @@ from utils import token
 from models.user.user_operation import get_user_by_username_and_pwd, get_user_by_id, update_login_time_and_ip
 
 app = FastAPI(
-    title='网盘共享系统',
-    description='网盘共享系统'
+    title='文件共享系统',
+    description='文件共享系统',
+    docs_url=None,
+    redoc_url=None
 )
 
 app.include_router(user_router)
@@ -105,6 +112,31 @@ def index(id: str = Depends(token.parse_token), db: Session = Depends(get_db)):
 
     }
     return content
+
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Swagger UI",
+        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+        swagger_js_url="/uploads/swagger-ui/swagger-ui-bundle.js",
+        swagger_css_url="/uploads/swagger-ui/swagger-ui.css",
+    )
+
+
+@app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
+async def swagger_ui_redirect():
+    return get_swagger_ui_oauth2_redirect_html()
+
+
+@app.get("/redoc", include_in_schema=False)
+async def redoc_html():
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - ReDoc",
+        redoc_js_url="/static/redoc.standalone.js",
+    )
 
 
 if __name__ == '__main__':
