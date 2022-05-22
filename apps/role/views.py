@@ -55,7 +55,7 @@ async def edit(
 
 
 # 删除角色
-@router.post('/delete')
+@router.post('/delete', tags=['角色模块'])
 def delete_role(role: RoleRet,
                 token_id: str = Depends(token.parse_token),
                 db: Session = Depends(get_db)):

@@ -109,7 +109,7 @@ async def edit(avatar: UploadFile = File(...),
     return {'code': 200, 'msg': '更新成功', 'id': id}
 
 
-@router.post('/delete')
+@router.post('/delete', tags=['用户模块'])
 def delete_user(user: UserRet,
                 user_id: str = Depends(token.parse_token),
                 db: Session = Depends(get_db)):
@@ -123,7 +123,7 @@ def delete_user(user: UserRet,
 
 
 # 获取所有的部门
-@router.get('/get_departments')
+@router.get('/get_departments', tags=['部门模块'])
 def get_department(user_id: str = Depends(token.parse_token),
                    db: Session = Depends(get_db)):
     departments = get_departments(db)
@@ -135,7 +135,7 @@ def get_department(user_id: str = Depends(token.parse_token),
 
 
 # 获取除自己以外的所有部门
-@router.get('/get_departments_except_me')
+@router.get('/get_departments_except_me', tags=['部门模块'])
 def get_department_except(
         id: int,
         user_id: str = Depends(token.parse_token),
