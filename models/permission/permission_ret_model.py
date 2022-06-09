@@ -14,8 +14,12 @@ class PermissionRet(BaseModel):
     method: Optional[str]
     # 参数
     args: Optional[str]
+    # 菜单级别
+    level: Optional[str]
     # 父级菜单
     parent_name: Optional[str]
+    # 父级id
+    parent_id: Optional[int]
     # 描述
     desc: Optional[str]
     # 创建时间:年月日 时分秒

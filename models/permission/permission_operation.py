@@ -8,7 +8,8 @@ from models.permission.permission_ret_model import PermissionRet
 
 def get_permission_pagenation(db: Session, page_size: int, current_page: int) -> [Permission]:
     permissions = db.query(Permission.id, Permission.name, Permission.url, Permission.method, Permission.args,
-                           Permission.parent_id, Permission.desc, Permission.create_time).limit(page_size).offset((current_page - 1) * page_size).all()
+                           Permission.parent_id, Permission.desc, Permission.create_time).limit(page_size).offset(
+        (current_page - 1) * page_size).all()
     return permissions
 
 
@@ -67,6 +68,11 @@ def delete_permission_by_id(db: Session, id: int):
     db.delete(permission)
     db.commit()
     db.flush()
+
+
+def get_permission_by_id(db: Session, id: int):
+    permission = db.query(Permission).filter(Permission.id == id).first()
+    return permission
 
 
 def permission_add(db: Session, permission: PermissionRet):
