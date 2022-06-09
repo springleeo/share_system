@@ -7,7 +7,7 @@ from extend.db import Base
 from sqlalchemy import Column, Integer, String, DateTime, Date
 
 
-class Rermission(Base):
+class Permission(Base):
     __tablename__ = "permission"
     id = Column(Integer, primary_key=True, autoincrement=True)
     # 权限名称
