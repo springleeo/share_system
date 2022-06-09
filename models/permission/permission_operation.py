@@ -63,6 +63,15 @@ def permission_edit(db: Session, permissions: PermissionRet):
     db.flush()
 
 
+def get_permission_no_parent_names(db: Session, id: int) -> [Permission]:
+    permission = db.query(Permission).filter(Permission.id == id).first()
+    if permission.parent_id == 0:  # 一级菜单，父级菜单是无，显示其他父级菜单
+        permissions = db.query(Permission).filter(Permission.id != permission.id, Permission.parent_id == 0).all()
+    else:  # 二级菜单，显示所有父级菜单
+        permissions = db.query(Permission).filter(Permission.parent_id == 0).all()
+    return permissions
+
+
 def delete_permission_by_id(db: Session, id: int):
     permission = db.query(Permission).filter(Permission.id == id).first()
     db.delete(permission)

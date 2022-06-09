@@ -7,7 +7,8 @@ from extend.get_db import get_db
 from models.permission.permission_ret_model import PermissionRet
 from models.permission.permission_operation import get_permission_pagenation, get_permission_query_total, \
     get_permission_total, \
-    get_permission_query_pagenation, permission_add, permission_edit, delete_permission_by_id, get_permission_by_id
+    get_permission_query_pagenation, permission_add, permission_edit, delete_permission_by_id, get_permission_by_id, \
+    get_permission_no_parent_names
 from utils import token
 
 router = APIRouter(
@@ -19,10 +20,9 @@ router = APIRouter(
 def get_permission_list(page_size: int, current_page: int, token_id: str = Depends(token.parse_token),
                         db: Session = Depends(get_db)):
     permissions = get_permission_pagenation(db, page_size, current_page)
-
     permission_rets = []
-    permission_ret = PermissionRet()
     for permission in permissions:
+        permission_ret = PermissionRet()
         permission_ret.id = permission.id
         permission_ret.name = permission.name
         permission_ret.url = permission.url
@@ -71,6 +71,15 @@ async def edit(
     permission_edit(db, department)
 
     content = {'code': 200, 'msg': '更新成功'}
+    return content
+
+
+# 获取父级菜单
+@router.get('/get_no_parent_names', tags=['权限模块'])
+def get_no_parent_names(id: int, token_id: str = Depends(token.parse_token),
+                        db: Session = Depends(get_db)):
+    parent_names = get_permission_no_parent_names(db, id)
+    content = {'code': 200, 'parent_names': parent_names}
     return content
 
 
