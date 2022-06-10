@@ -65,10 +65,10 @@ def get_permission_query_list(name: str, page_size: int, current_page: int, toke
 # 修改
 @router.post('/edit', tags=['权限模块'])
 async def edit(
-        department: PermissionRet,
+        permission: PermissionRet,
         token_id: str = Depends(token.parse_token),
         db: Session = Depends(get_db)):
-    permission_edit(db, department)
+    permission_edit(db, permission)
 
     content = {'code': 200, 'msg': '更新成功'}
     return content

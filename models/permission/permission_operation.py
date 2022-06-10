@@ -57,8 +57,13 @@ def permission_edit(db: Session, permissions: PermissionRet):
     permission.url = permissions.url
     permission.method = permissions.method
     permission.args = permissions.args
-    permission.parent_id = permissions.parent_id
     permission.desc = permissions.desc
+    if permissions.parent_name == '无':
+        permission.parent_id = 0
+    else:
+        permission_by_parent_name = db.query(Permission).filter(Permission.name == permissions.parent_name).first()
+        permission.parent_id = permission_by_parent_name.id
+
     db.commit()
     db.flush()
 
