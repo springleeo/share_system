@@ -52,9 +52,27 @@ def get_permission_list(page_size: int, current_page: int, token_id: str = Depen
 def get_permission_query_list(name: str, page_size: int, current_page: int, token_id: str = Depends(token.parse_token),
                               db: Session = Depends(get_db)):
     permissions = get_permission_query_pagenation(db, name, page_size, current_page)
+    permission_rets = []
+    for permission in permissions:
+        permission_ret = PermissionRet()
+        permission_ret.id = permission.id
+        permission_ret.name = permission.name
+        permission_ret.url = permission.url
+        permission_ret.method = permission.method
+        permission_ret.args = permission.args
+        permission_ret.desc = permission.desc
+        permission_ret.create_time = permission.create_time
+        if permission.parent_id == 0:
+            permission_ret.parent_name = '无'
+            permission_ret.level = '一级'
+        else:
+            permission_by_parent_id = get_permission_by_id(db, permission.parent_id)
+            permission_ret.parent_name = permission_by_parent_id.name
+            permission_ret.level = '二级'
+        permission_rets.append(permission_ret)
     total = get_permission_query_total(db, name)
     content = {
-        'permissions': permissions,
+        'permissions': permission_rets,
         'pageSize': page_size,
         'currentPage': current_page,
         'pageTotal': total
