@@ -77,6 +77,11 @@ def get_permission_no_parent_names(db: Session, id: int) -> [Permission]:
     return permissions
 
 
+def get_permission_parent_names(db: Session) -> [Permission]:
+    permissions = db.query(Permission).filter(Permission.parent_id == 0).all()
+    return permissions
+
+
 def delete_permission_by_id(db: Session, id: int):
     permission = db.query(Permission).filter(Permission.id == id).first()
     db.delete(permission)
@@ -90,8 +95,15 @@ def get_permission_by_id(db: Session, id: int):
 
 
 def permission_add(db: Session, permission: PermissionRet):
-    permission = Permission(name=permission.name, url=permission.url, method=permission.method, args=permission.args,
-                            parent_id=permission.parent_id, desc=permission.desc)
+    if permission.parent_name == "无":
+        permission = Permission(name=permission.name, url=permission.url, method=permission.method,
+                                args=permission.args,
+                                parent_id=0, desc=permission.desc)
+    else:
+        permission_by_parent_name = db.query(Permission).filter(Permission.name == permission.parent_name).first()
+        permission = Permission(name=permission.name, url=permission.url, method=permission.method,
+                                args=permission.args,
+                                parent_id=permission_by_parent_name.id, desc=permission.desc)
     db.add(permission)
     db.commit()
     db.flush()

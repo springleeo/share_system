@@ -8,7 +8,7 @@ from models.permission.permission_ret_model import PermissionRet
 from models.permission.permission_operation import get_permission_pagenation, get_permission_query_total, \
     get_permission_total, \
     get_permission_query_pagenation, permission_add, permission_edit, delete_permission_by_id, get_permission_by_id, \
-    get_permission_no_parent_names
+    get_permission_no_parent_names, get_permission_parent_names
 from utils import token
 
 router = APIRouter(
@@ -82,6 +82,14 @@ def get_no_parent_names(id: int, token_id: str = Depends(token.parse_token),
     content = {'code': 200, 'parent_names': parent_names}
     return content
 
+
+# 获取父级菜单
+@router.get('/get_parent_names', tags=['权限模块'])
+def get_parent_names(token_id: str = Depends(token.parse_token),
+                        db: Session = Depends(get_db)):
+    parent_names = get_permission_parent_names(db)
+    content = {'code': 200, 'parent_names': parent_names}
+    return content
 
 # 删除角色
 @router.post('/delete', tags=['权限模块'])
