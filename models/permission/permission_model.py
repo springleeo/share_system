@@ -22,6 +22,8 @@ class Permission(Base):
     parent_id = Column(Integer)
     # 描述
     desc = Column(String(255))
+    # 排队权重字段，数据越大排序越靠前
+    sort = Column(Integer)
 
     # 创建时间:年月日 时分秒
     create_time = Column(DateTime, default=datetime.datetime.now())
