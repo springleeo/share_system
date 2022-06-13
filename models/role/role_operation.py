@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from typing import List
 
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
-from models.role.role_model import Role
+from models.role.role_model import Role, RoleUsers
+from models.user.user_model import User
 from models.role.role_ret_model import RoleRet
 
 
@@ -70,3 +72,23 @@ def role_add(db: Session, role: RoleRet):
     db.add(role)
     db.commit()
     db.flush()
+
+
+def get_db_users(db: Session):
+    users = db.query(User.id, User.username).filter(User.state == 1).all()
+    return users
+
+
+def get_db_role_users(db: Session, role_id: int) -> [RoleUsers]:
+    role_users = db.query(RoleUsers.user_id).filter(RoleUsers.role_id == role_id).all()
+    return role_users
+
+
+def save_db_config_users(db: Session, role_id: int, config_users: [int]):
+    role_users = db.query(RoleUsers).filter(RoleUsers.role_id == role_id).delete(synchronize_session=False)
+    db.commit()
+    role_users_list = []
+    for i in config_users:
+        role_users_list.append(RoleUsers(role_id=role_id, user_id=i))
+    db.add_all(role_users_list)
+    db.commit()
