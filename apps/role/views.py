@@ -9,7 +9,7 @@ from extend.get_db import get_db
 from models.role.role_ret_model import RoleRet
 from models.role.role_operation import get_role_pagenation, get_role_query_total, get_role_total, \
     get_role_query_pagenation, role_add, role_edit, delete_role_by_id, get_db_users, get_db_role_users, \
-    save_db_config_users
+    save_db_config_users, get_db_permissions_info, save_db_permission_config
 from utils import token
 
 router = APIRouter(
@@ -125,4 +125,29 @@ def save_config_users(role_id: int = Form(...),
     save_db_config_users(db, role_id, config_users.split(','))
     return JSONResponse(content={
         'code': 200,
+    })
+
+
+# 获取角色配置的所有菜单列表和已配置的菜单列表
+@router.post('/get_permissions_info', tags=['角色模块'])
+def get_permissions_info(role_id: int = Form(...),
+                         token_id: str = Depends(token.parse_token),
+                         db: Session = Depends(get_db)):
+    permissions_info = get_db_permissions_info(db, role_id)
+    return JSONResponse(content={
+        'code': 200,
+        'permissions_info': permissions_info
+    })
+
+# 保存角色配置的所有菜单
+@router.post('/save_permission_config', tags=['角色模块'])
+def save_permission_config(
+        role_id: int = Form(...),
+        selected_permissions: str = Form(...),
+        token_id: str = Depends(token.parse_token),
+        db: Session = Depends(get_db)):
+    save_db_permission_config(db, role_id, selected_permissions.split(','))
+    return JSONResponse(content={
+        'code': 200,
+        'msg':'更新成功'
     })
