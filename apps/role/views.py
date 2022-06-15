@@ -9,7 +9,7 @@ from extend.get_db import get_db
 from models.role.role_ret_model import RoleRet
 from models.role.role_operation import get_role_pagenation, get_role_query_total, get_role_total, \
     get_role_query_pagenation, role_add, role_edit, delete_role_by_id, get_db_users, get_db_role_users, \
-    save_db_config_users, get_db_permissions_info, save_db_permission_config
+    save_db_config_users, get_db_permissions_info, save_db_permission_config, get_menu_by_user_id
 from utils import token
 
 router = APIRouter(
@@ -139,6 +139,7 @@ def get_permissions_info(role_id: int = Form(...),
         'permissions_info': permissions_info
     })
 
+
 # 保存角色配置的所有菜单
 @router.post('/save_permission_config', tags=['角色模块'])
 def save_permission_config(
@@ -149,5 +150,19 @@ def save_permission_config(
     save_db_permission_config(db, role_id, selected_permissions.split(','))
     return JSONResponse(content={
         'code': 200,
-        'msg':'更新成功'
+        'msg': '更新成功'
+    })
+
+
+# 获取菜单
+@router.get('/get_menus', tags=['角色模块'])
+def get_menus(
+        token_id: str = Depends(token.parse_token),
+        db: Session = Depends(get_db)
+):
+    tree = get_menu_by_user_id(db, int(token_id))  # token_id就是用户的id，这个有点迷惑
+    # todo 假如tree为空，跳转到没有权限的页面
+    return JSONResponse(content={
+        'code': 200,
+        'items': tree,
     })

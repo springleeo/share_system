@@ -87,7 +87,7 @@ def get_db_role_users(db: Session, role_id: int) -> [RoleUsers]:
 
 
 def save_db_config_users(db: Session, role_id: int, config_users: [int]):
-    role_users = db.query(RoleUsers).filter(RoleUsers.role_id == role_id).delete(synchronize_session=False)
+    db.query(RoleUsers).filter(RoleUsers.role_id == role_id).delete(synchronize_session=False)
     db.commit()
     role_users_list = []
     for i in config_users:
@@ -109,7 +109,7 @@ def save_db_config_users(db: Session, role_id: int, config_users: [int]):
 # },
 def get_db_permissions_info(db: Session, role_id: int):
     tree = []
-    permissions = db.query(Permission).filter(Permission.parent_id == 0).all()
+    permissions = db.query(Permission).order_by(Permission.sort.desc()).filter(Permission.parent_id == 0).all()
     for permission in permissions:
         first_level = {
             'id': permission.id,
@@ -151,3 +151,54 @@ def save_db_permission_config(db: Session, role_id: int, selected_permissions: [
         role_permissions_list.append(RolePermissions(role_id=role_id, permission_id=i))
     db.add_all(role_permissions_list)
     db.commit()
+
+
+def get_menu_by_user_id(db: Session, user_id: int):
+    tree = []
+    # 获取用户的所有角色
+    role_users = db.query(RoleUsers.role_id).filter(RoleUsers.user_id == user_id).all()
+    role_id_list = [i.role_id for i in role_users]
+    # 获取角色的所有权限
+    role_permissions = db.query(RolePermissions.permission_id).filter(RolePermissions.role_id.in_(role_id_list)).all()
+    permission_id_list = [rp.permission_id for rp in role_permissions]
+    # 查询权限中所有一级菜单
+    permissions = db.query(Permission).order_by(Permission.sort.desc()).filter(Permission.id.in_(permission_id_list),
+                                                                               Permission.parent_id == 0).all()
+    for permission in permissions:
+        if permission.name == '首页':
+            first_level = {
+                'icon': permission.icon,
+                'index': permission.url,
+                'title': permission.name,
+            }
+        else:
+            first_level = {
+                'icon': permission.icon,
+                'index': permission.id,
+                'title': permission.name,
+                'subs': []
+            }
+        # 查询是否有二级菜单
+        next_permission = db.query(Permission).filter(Permission.parent_id == permission.id).all()
+        if next_permission:
+            first_level['subs'] = get_menu_children(db, next_permission)
+        tree.append(first_level)
+    return tree
+
+
+def get_menu_children(db: Session, permission: [Permission]):
+    children = []
+    for child in permission:
+        next_child = {
+            'icon': child.icon,
+            'index': child.url,
+            'title': child.name,
+            'subs': []
+        }
+        next_permission = db.query(Permission).filter(Permission.parent_id == child.id).all()
+        if next_permission:
+            next_child['subs'] = get_menu_children(db, next_permission)
+        else:
+            next_child.pop('subs')
+        children.append(next_child)
+    return children

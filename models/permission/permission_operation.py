@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from models.permission.permission_model import Permission
 from models.permission.permission_ret_model import PermissionRet
+from models.role.role_model import RoleUsers, RolePermissions
 
 
 def get_permission_pagenation(db: Session, page_size: int, current_page: int) -> [Permission]:
@@ -109,3 +110,7 @@ def permission_add(db: Session, permission: PermissionRet):
     db.add(permission)
     db.commit()
     db.flush()
+
+
+
+
