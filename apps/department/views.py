@@ -92,3 +92,5 @@ async def add(departments: DepartmentRet,
         'code': 200,
         'msg': '添加成功',
     })
+
+

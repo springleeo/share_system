@@ -9,7 +9,8 @@ from models.user.user_ret_model import UserRet
 from utils import token
 from utils.get_md5_data import get_md5_pwd
 from models.user.user_operation import get_user_pagenation, get_user_total, active, user_update, delete_user_by_id, \
-    user_add, get_user_query_pagenation, get_user_query_total, get_departments, get_departments_except_me
+    user_add, get_user_query_pagenation, get_user_query_total, get_departments, get_departments_except_me, \
+    get_user_by_id
 
 router = APIRouter(
     prefix='/user'
@@ -123,7 +124,7 @@ def delete_user(user: UserRet,
 
 
 # 获取所有的部门
-@router.get('/get_departments', tags=['部门模块'])
+@router.get('/get_departments', tags=['用户模块'])
 def get_department(user_id: str = Depends(token.parse_token),
                    db: Session = Depends(get_db)):
     departments = get_departments(db)
@@ -135,7 +136,7 @@ def get_department(user_id: str = Depends(token.parse_token),
 
 
 # 获取除自己以外的所有部门
-@router.get('/get_departments_except_me', tags=['部门模块'])
+@router.get('/get_departments_except_me', tags=['用户模块'])
 def get_department_except(
         id: int,
         user_id: str = Depends(token.parse_token),
@@ -145,4 +146,15 @@ def get_department_except(
         'code': 200,
         'msg': '查询成功',
         'departments': departments
+    }
+
+
+# 获取用户头像
+@router.get('/get_avatar', tags=['用户模块'])
+def get_avatar(user_id: str = Depends(token.parse_token),
+               db: Session = Depends(get_db)):
+    user = get_user_by_id(db, int(user_id))
+    return {
+        'code': 200,
+        'avatar': user.avatar,
     }
