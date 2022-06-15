@@ -22,6 +22,8 @@ class PermissionRet(BaseModel):
     parent_id: Optional[int]
     # 描述
     desc: Optional[str]
+    # 图标
+    icon: Optional[str]
     # 创建时间:年月日 时分秒
     create_time: Optional[str]
     # 创建日期

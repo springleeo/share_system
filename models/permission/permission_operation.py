@@ -8,7 +8,8 @@ from models.permission.permission_ret_model import PermissionRet
 
 def get_permission_pagenation(db: Session, page_size: int, current_page: int) -> [Permission]:
     permissions = db.query(Permission.id, Permission.name, Permission.url, Permission.method, Permission.args,
-                           Permission.parent_id, Permission.desc, Permission.create_time).limit(page_size).offset(
+                           Permission.parent_id, Permission.desc, Permission.icon, Permission.create_time).limit(
+        page_size).offset(
         (current_page - 1) * page_size).all()
     return permissions
 
@@ -20,7 +21,7 @@ def get_permission_query_pagenation(db: Session, name: str, page_size: int, curr
 
     # 多条件或查询or_
     permissions = db.query(Permission.id, Permission.name, Permission.url, Permission.method, Permission.args,
-                           Permission.parent_id, Permission.desc, Permission.create_time).filter(
+                           Permission.parent_id, Permission.desc, Permission.icon, Permission.create_time).filter(
         or_(Permission.name.like("%" + name + "%") if name is not None else "",
             Permission.desc.like("%" + name + "%") if name is not None else "")
     ).limit(page_size).offset((current_page - 1) * page_size).all()
@@ -58,6 +59,7 @@ def permission_edit(db: Session, permissions: PermissionRet):
     permission.method = permissions.method
     permission.args = permissions.args
     permission.desc = permissions.desc
+    permission.icon = permissions.icon
     if permissions.parent_name == '无':
         permission.parent_id = 0
     else:

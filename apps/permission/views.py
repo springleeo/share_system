@@ -29,6 +29,7 @@ def get_permission_list(page_size: int, current_page: int, token_id: str = Depen
         permission_ret.method = permission.method
         permission_ret.args = permission.args
         permission_ret.desc = permission.desc
+        permission_ret.icon = permission.icon
         permission_ret.create_time = permission.create_time
         if permission.parent_id == 0:
             permission_ret.parent_name = '无'
@@ -61,6 +62,7 @@ def get_permission_query_list(name: str, page_size: int, current_page: int, toke
         permission_ret.method = permission.method
         permission_ret.args = permission.args
         permission_ret.desc = permission.desc
+        permission_ret.icon = permission.icon
         permission_ret.create_time = permission.create_time
         if permission.parent_id == 0:
             permission_ret.parent_name = '无'
